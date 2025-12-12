@@ -1,0 +1,125 @@
+import java.util.*;
+
+class student{
+    private String id,name;
+    private int marks;
+
+    public student(String id , String name , int marks){
+        this.id=id;
+        this.name=name;
+        this.marks=marks;
+    }
+
+    public String getId(){
+        return id;
+    }
+
+    public int getMarks(){
+        return marks;
+    }
+
+    public String getRole(){
+        return "undergrad";
+    }
+
+    @Override
+    public String toString(){
+        return id + " "+ name+" ( "+ marks + " ) "+ getRole();
+    }
+}
+
+class graduateStudent extends student {
+    private String area;
+
+    public graduateStudent(String id, String name, int marks,String area) {
+        super(id,name,marks);
+        this.area=area;
+    }
+
+    @Override
+    public String getRole(){
+        return "Grad( " + area + ")";
+    }
+}
+
+class Teacher extends student {
+    private String subject;
+    private List<student> teaches = new ArrayList<>();
+
+    public Teacher(String id, String name, int marks, String subject) {
+        super(id, name, marks);
+        this.subject = subject;
+    }
+    public void addStudent(student s) {
+        teaches.add(s);
+    }
+    public void showReport() {
+        System.out.println("\nTeacher: " + getId() + " - Subject: " + subject);
+        System.out.println("STUDENT REPORT:");
+        teaches.forEach(System.out::println);
+    }
+    @Override
+    public String getRole() {
+        return "Teacher(" + subject + ")";
+    }
+}
+class Repository<T>{
+    private Map<String,T> data = new HashMap<>();
+
+    public void save(String id,T obj){
+        data.put(id,obj);
+    }
+    public T find(String id){
+        return data.get(id);
+    }
+    public void delete(String id){
+        data.remove(id);
+    }
+}
+
+public class MAIN{
+    public static void main(String[] args) {
+        List<student> list = new ArrayList<>();
+        student s1 = new student("s1","Abhay", 98);
+        student s2 = new student("s2","Himanshu", 97);
+        student s3 = new student("s3","Premdeep", 96);
+        graduateStudent g1 = new graduateStudent("G1","Abhishek",95,"CSE");
+        graduateStudent g2 = new graduateStudent("G2","Ranjit",94,"ECE");
+
+        list.add(s1);
+        list.add(s2);
+        list.add(s3);
+        list.add(g1);
+        list.add(g2);
+
+        Repository<student> repo = new Repository<>();
+        for(student s:list) repo.save(s.getId(),s);
+
+        System.out.println("All: ");
+        list.forEach(System.out::println);
+
+        System.out.println("\nLOOKUP S2: ");
+        student s = repo.find("s2");
+        System.out.println(s != null ? s:"Not Found");
+
+        Iterator<student> it = list.iterator();
+        while(it.hasNext()){
+            student st = it.next();
+            if(st.getMarks()<96){
+                it.remove();
+                repo.delete(st.getId());
+            }
+        }
+
+        System.out.println("\nAfter Removal");
+        list.forEach(System.out::println);
+        System.out.println("-----------");
+        System.out.println("\n");
+
+        Teacher t1 = new Teacher("T1", "Amit Sir", 0, "Maths");
+        t1.addStudent(s1);
+        t1.addStudent(s2);
+        t1.addStudent(g1);
+        t1.showReport();
+    }
+}
